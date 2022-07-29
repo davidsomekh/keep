@@ -32,7 +32,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final Color oddItemColor = colorScheme.primary.withOpacity(0.05);
     final Color evenItemColor = colorScheme.primary.withOpacity(0.15);
 
     return ReorderableListView(
@@ -45,15 +44,14 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
               children: <Widget>[
                 Container(
                   width: MediaQuery.of(context).size.width,
-                  height: 64,
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(0),
                   child: ReorderableDragStartListener(
                     index: index,
                     child: ListTile(
                         key: Key('$index'),
                         tileColor: evenItemColor,
-                        title: Text('Task ${_items[index]}'),
-                        onTap: () => print("ListTile")),
+                        title: Text('Todo ${_items[index]}'),
+                        onTap: () => debugPrint("ListTile")),
                   ),
                 )
               ],
@@ -61,7 +59,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           ),
       ],
       onReorder: (int oldIndex, int newIndex) {
-        print("starting");
+        debugPrint("reorder finished");
         setState(() {
           if (oldIndex < newIndex) {
             newIndex -= 1;
