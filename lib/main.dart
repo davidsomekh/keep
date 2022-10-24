@@ -5,69 +5,80 @@ void main() => runApp(const MyApp());
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  static const String _title = 'Flutter Code Sample';
-
   @override
   Widget build(BuildContext context) {
+    const appTitle = 'Welcome to keeplist! 👋';
     return MaterialApp(
-      title: _title,
+      title: appTitle,
       home: Scaffold(
-        appBar: AppBar(title: const Text(_title)),
-        body: const MyStatefulWidget(),
+        appBar: AppBar(
+          title: const Text(appTitle),
+        ),
+        body: const MyCustomForm(),
       ),
     );
   }
 }
 
-class MyStatefulWidget extends StatefulWidget {
-  const MyStatefulWidget({Key? key}) : super(key: key);
-
-  @override
-  State<MyStatefulWidget> createState() => _MyStatefulWidgetState();
-}
-
-class _MyStatefulWidgetState extends State<MyStatefulWidget> {
-  final List<int> _items = List<int>.generate(50, (int index) => index);
+class MyCustomForm extends StatelessWidget {
+  const MyCustomForm({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final Color evenItemColor = colorScheme.primary.withOpacity(0.15);
+    return Column(
 
-    return ReorderableListView(
-      buildDefaultDragHandles: false,
       children: <Widget>[
-        for (int index = 0; index < _items.length; index++)
-          Container(
-            key: Key('$index'),
-            child: Row(
-              children: <Widget>[
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  padding: const EdgeInsets.all(0),
-                  child: ReorderableDragStartListener(
-                    index: index,
-                    child: ListTile(
-                        key: Key('$index'),
-                        tileColor: evenItemColor,
-                        title: Text('Todo ${_items[index]}'),
-                        onTap: () => debugPrint("ListTile")),
-                  ),
-                )
-              ],
+        
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+          child: TextFormField(
+            decoration: const InputDecoration(
+              
+              border: UnderlineInputBorder(),
+              labelText: 'Enter your username 👇',
             ),
           ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+          child: TextFormField(
+            decoration: const InputDecoration(
+              border: UnderlineInputBorder(),
+              labelText: 'Enter your password 👇',
+            ),
+            obscureText: true,
+          ),
+        ),
+    
+        Container(
+             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+          child: Align(
+            alignment: Alignment.bottomLeft,
+            child: ElevatedButton(
+                          child: const Text('Submit'),
+
+              onPressed: () {},
+            ),
+          ),
+        ),
+        Container(
+             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+          child: Align(
+            alignment: Alignment.bottomLeft,
+            child: ElevatedButton(
+                          child: const Text('New User ❤️ '),
+
+              onPressed: () {},
+               style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.black),
+                ),
+            ),
+          ),
+        ),
+        
       ],
-      onReorder: (int oldIndex, int newIndex) {
-        debugPrint("reorder finished");
-        setState(() {
-          if (oldIndex < newIndex) {
-            newIndex -= 1;
-          }
-          final int item = _items.removeAt(oldIndex);
-          _items.insert(newIndex, item);
-        });
-      },
+      
     );
+    
   }
 }
