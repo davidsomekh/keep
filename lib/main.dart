@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -109,7 +107,7 @@ class _AuthFormState extends State<AuthForm> {
   }
 
   void showLoginError(String msg) {
-    var snackBar = new SnackBar(content: new Text(msg));
+    var snackBar =  SnackBar(content: Text(msg));
 
 // Find the ScaffoldMessenger in the widget tree
 // and use it to show a SnackBar.
@@ -117,7 +115,17 @@ class _AuthFormState extends State<AuthForm> {
   }
 
   Future login() async {
-    //showLoginError("hi");
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user?.email == null) {
+        //showLoginError('welcome!');
+      } else {
+         if (user?.email != null) {
+          String? t = user?.email;
+          showLoginError('welcome!${t!}');
+        }
+      }
+    });
+
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text.trim(),
@@ -131,6 +139,6 @@ class _AuthFormState extends State<AuthForm> {
       } else {
         showLoginError(e.code);
       }
-    } catch (e) {}
+    } 
   }
 }
