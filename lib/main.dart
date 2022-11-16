@@ -67,8 +67,8 @@ class MyCustomForm extends StatelessWidget {
           child: Align(
             alignment: Alignment.bottomLeft,
             child: ElevatedButton(
-              child: const Text('Login'),
               onPressed: login,
+              child: const Text('Login'),
             ),
           ),
         ),
@@ -77,11 +77,11 @@ class MyCustomForm extends StatelessWidget {
           child: Align(
             alignment: Alignment.bottomLeft,
             child: ElevatedButton(
-              child: const Text('Create new account 👋'),
               onPressed: () {},
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all(Colors.black),
               ),
+              child: const Text('New user 👋'),
             ),
           ),
         ),
@@ -91,19 +91,18 @@ class MyCustomForm extends StatelessWidget {
 
   Future login() async {
     try {
-      final credential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: "test@fl.com",
         password: "law227",
       );
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        print('The password provided is too weak.');
+        /// print('The password provided is too weak.');
       } else if (e.code == 'email-already-in-use') {
-        print('The account already exists for that email.');
+        // print('The account already exists for that email.');
       }
     } catch (e) {
-      print(e);
+      //print(e);
     }
   }
 }
