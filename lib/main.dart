@@ -22,14 +22,29 @@ class MyApp extends StatelessWidget {
         appBar: AppBar(
           title: const Text(appTitle),
         ),
-        body: const MyCustomForm(),
+        body: const AuthForm(),
       ),
     );
   }
 }
 
-class MyCustomForm extends StatelessWidget {
-  const MyCustomForm({Key? key}) : super(key: key);
+class AuthForm extends StatefulWidget {
+  const AuthForm({super.key});
+
+  @override
+  State<AuthForm> createState() => _AuthFormState();
+}
+
+class _AuthFormState extends State<AuthForm> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +53,7 @@ class MyCustomForm extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
           child: TextFormField(
+            controller: emailController,
             decoration: const InputDecoration(
               border: UnderlineInputBorder(),
               labelText: 'Enter your username',
@@ -51,6 +67,7 @@ class MyCustomForm extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
           child: TextFormField(
+            controller: passwordController,
             decoration: const InputDecoration(
               border: UnderlineInputBorder(),
               labelText: 'Enter your password',
@@ -92,8 +109,8 @@ class MyCustomForm extends StatelessWidget {
   Future login() async {
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: "test@fl.com",
-        password: "law227",
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
       );
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
