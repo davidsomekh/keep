@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-void main() => runApp(const MyApp());
+Future main() async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -60,9 +68,8 @@ class MyCustomForm extends StatelessWidget {
             alignment: Alignment.bottomLeft,
             child: ElevatedButton(
               child: const Text('Login'),
-              onPressed: () {},
+              onPressed: login,
             ),
-            
           ),
         ),
         Container(
@@ -80,5 +87,23 @@ class MyCustomForm extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Future login() async {
+    try {
+      final credential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: "test@fl.com",
+        password: "law227",
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        print('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        print('The account already exists for that email.');
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 }
