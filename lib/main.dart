@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -106,20 +108,29 @@ class _AuthFormState extends State<AuthForm> {
     );
   }
 
+  void showLoginError(String msg) {
+    var snackBar = new SnackBar(content: new Text(msg));
+
+// Find the ScaffoldMessenger in the widget tree
+// and use it to show a SnackBar.
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   Future login() async {
+    //showLoginError("hi");
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        /// print('The password provided is too weak.');
+        showLoginError('The password provided is too weak.');
       } else if (e.code == 'email-already-in-use') {
-        // print('The account already exists for that email.');
+        showLoginError('The account already exists for that email.');
+      } else {
+        showLoginError(e.code);
       }
-    } catch (e) {
-      //print(e);
-    }
+    } catch (e) {}
   }
 }
