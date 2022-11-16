@@ -23,9 +23,7 @@ class _LoginPageState extends State<LoginPage> {
         password: _controllerPassword.text,
       );
     } on FirebaseAuthException catch (e) {
-      setState(() {
-        showLoginError(e.message!);
-      });
+      showLoginError(e.message!);
     }
   }
 
@@ -36,9 +34,7 @@ class _LoginPageState extends State<LoginPage> {
         password: _controllerPassword.text,
       );
     } on FirebaseAuthException catch (e) {
-      setState(() {
-        errorMessage = e.message;
-      });
+      showLoginError(e.message!);
     }
   }
 
