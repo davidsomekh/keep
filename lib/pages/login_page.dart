@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../auth.dart';
+import '../google_sign_in.dart';
+import 'package:provider/provider.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -77,6 +81,19 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Widget _googleButton() {
+    return ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.black, foregroundColor: Colors.white),
+      onPressed: () {
+        final provider = Provider.of<GoogleSignInProvider>(context,listen:false);
+        provider.googleLogin();
+      },
+      label: const Text("Login with Google"),
+      icon: const FaIcon(FontAwesomeIcons.google, color: Colors.red),
+    );
+  }
+
   Widget _loginOrRegisterButton() {
     return TextButton(
       onPressed: () {
@@ -108,6 +125,7 @@ class _LoginPageState extends State<LoginPage> {
                 'password', const Icon(Icons.lock), _controllerPassword, true),
             _submitButton(),
             _loginOrRegisterButton(),
+            _googleButton(),
           ],
         ),
       ),

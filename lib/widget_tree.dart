@@ -16,8 +16,10 @@ class _WidgetTreeState extends State<WidgetTree> {
     return StreamBuilder(
       stream: Auth().authStateChanges,
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return HomePage();
+        if(snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasData) {
+          return const HomePage();
         } else {
           return const LoginPage();
         }

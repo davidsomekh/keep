@@ -7,42 +7,6 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:500327925220:android:ab494834a9da97b61c73f1",
-        "android_client_info": {
-          "package_name": "com.example.keeplist"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "500327925220-e24e4jdh0dapf6799o4aodp6ane0nb6v.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDfzJdz47v17M-g_jiI9yTMVmD1OUOVWSw"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "500327925220-e24e4jdh0dapf6799o4aodp6ane0nb6v.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "500327925220-0msljk3qsfc4ideu4q3elro9h6ksheo3.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.keeplist"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:500327925220:android:e9ee1912b1c77ddc1c73f1",
         "android_client_info": {
           "package_name": "com.keeplist"
