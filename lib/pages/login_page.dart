@@ -31,6 +31,11 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future signInWithApple() async {
+
+    Auth().appleLogin();
+  }
+
   Future<void> createUserWithEmailAndPassword() async {
     try {
       await Auth().createUserWithEmailAndPassword(
@@ -94,6 +99,19 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Widget _appleButton() {
+    return ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.black, foregroundColor: Colors.white),
+      onPressed: () {
+        signInWithApple();
+      },
+      label: const Text("Login with Apple"),
+      icon: const FaIcon(FontAwesomeIcons.apple, color: Colors.red),
+    );
+  }
+
+
   Widget _loginOrRegisterButton() {
     return TextButton(
       onPressed: () {
@@ -126,6 +144,9 @@ class _LoginPageState extends State<LoginPage> {
             _submitButton(),
             _loginOrRegisterButton(),
             _googleButton(),
+                const SizedBox(height: 6),
+
+            _appleButton(),
           ],
         ),
       ),

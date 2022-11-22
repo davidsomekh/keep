@@ -1,14 +1,21 @@
 import 'package:firebase_auth/firebase_auth.dart';
-
-
-
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class Auth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   User? get currentUser => _firebaseAuth.currentUser;
 
-  Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();  
+  Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
+
+  Future appleLogin() async {
+    final appleProvider = AppleAuthProvider();
+    if (kIsWeb) {
+      await FirebaseAuth.instance.signInWithPopup(appleProvider);
+    } else {
+      await FirebaseAuth.instance.signInWithProvider(appleProvider);
+    }
+  }
 
   Future<void> sendPasswordResetEmail({
     required String email,
@@ -36,8 +43,7 @@ class Auth {
     );
   }
 
-   Future<void> signOut() async {
-    
+  Future<void> signOut() async {
     await _firebaseAuth.signOut();
   }
 }
