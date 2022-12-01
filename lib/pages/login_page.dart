@@ -28,10 +28,10 @@ class _LoginPageState extends State<LoginPage> {
         email: _controllerEmail.text,
         password: _controllerPassword.text,
       );
+
+      showError('Welcome! ${_controllerEmail.text} 👋');
     } on FirebaseAuthException catch (e) {
       showError(e.message!);
-    } finally {
-      showError('Welcome! ${_controllerEmail.text} 👋');
     }
   }
 
@@ -42,10 +42,10 @@ class _LoginPageState extends State<LoginPage> {
     }
     try {
       await Auth().passReset(email: email);
+
+      showError('Reset instructions sent: ${_controllerEmail.text}');
     } on FirebaseAuthException catch (e) {
       showError(e.message!);
-    } finally {
-      showError('Reset instructions sent: ${_controllerEmail.text}');
     }
   }
 
@@ -79,10 +79,10 @@ class _LoginPageState extends State<LoginPage> {
         email: _controllerEmail.text,
         password: _controllerPassword.text,
       );
+
+      showError('Welcome! ${_controllerEmail.text} 👋');
     } on FirebaseAuthException catch (e) {
       showError(e.message!);
-    } finally {
-      showError('Welcome! ${_controllerEmail.text} 👋');
     }
   }
 
