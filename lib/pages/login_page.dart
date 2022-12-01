@@ -5,7 +5,6 @@ import '../auth.dart';
 import '../google_sign_in.dart';
 import 'package:provider/provider.dart';
 
-
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
@@ -21,29 +20,69 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _controllerPassword = TextEditingController();
 
   Future<void> signInWithEmailAndPassword() async {
+    if (!validateDetails()) {
+      return;
+    }
     try {
       await Auth().signInWithEmailAndPassword(
         email: _controllerEmail.text,
         password: _controllerPassword.text,
       );
     } on FirebaseAuthException catch (e) {
-      showLoginError(e.message!);
+      showError(e.message!);
+    } finally {
+      showError('Welcome! ${_controllerEmail.text} 👋');
     }
   }
 
-  Future signInWithApple() async {
+  Future passwordReset({required String email}) async {
+    if (!verifyUN()) {
+      showError('We need your email!');
+      return;
+    }
+    try {
+      await Auth().passReset(email: email);
+    } on FirebaseAuthException catch (e) {
+      showError(e.message!);
+    } finally {
+      showError('Reset instructions sent: ${_controllerEmail.text}');
+    }
+  }
 
+  bool validateDetails() {
+    if (_controllerEmail.text.isEmpty) {
+      showError("We need your email!");
+      return false;
+    }
+    if (_controllerPassword.text.isEmpty) {
+      showError("Password?");
+      return false;
+    }
+
+    return true;
+  }
+
+  bool verifyUN() {
+    return _controllerEmail.text.isNotEmpty;
+  }
+
+  Future signInWithApple() async {
     Auth().appleLogin();
   }
 
   Future<void> createUserWithEmailAndPassword() async {
+    if (!validateDetails()) {
+      return;
+    }
     try {
       await Auth().createUserWithEmailAndPassword(
         email: _controllerEmail.text,
         password: _controllerPassword.text,
       );
     } on FirebaseAuthException catch (e) {
-      showLoginError(e.message!);
+      showError(e.message!);
+    } finally {
+      showError('Welcome! ${_controllerEmail.text} 👋');
     }
   }
 
@@ -70,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void showLoginError(String msg) {
+  void showError(String msg) {
     var snackBar = SnackBar(content: Text(msg));
 
 // Find the ScaffoldMessenger in the widget tree
@@ -91,7 +130,8 @@ class _LoginPageState extends State<LoginPage> {
       style: ElevatedButton.styleFrom(
           backgroundColor: Colors.black, foregroundColor: Colors.white),
       onPressed: () {
-        final provider = Provider.of<GoogleSignInProvider>(context,listen:false);
+        final provider =
+            Provider.of<GoogleSignInProvider>(context, listen: false);
         provider.googleLogin();
       },
       label: const Text("Login with Google"),
@@ -111,6 +151,17 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Widget _forgotButton() {
+    return ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.black, foregroundColor: Colors.white),
+      onPressed: () {
+        passwordReset(email: _controllerEmail.text);
+      },
+      label: const Text("Forgot your password?"),
+      icon: const FaIcon(FontAwesomeIcons.lock, color: Colors.red),
+    );
+  }
 
   Widget _loginOrRegisterButton() {
     return TextButton(
@@ -144,9 +195,10 @@ class _LoginPageState extends State<LoginPage> {
             _submitButton(),
             _loginOrRegisterButton(),
             _googleButton(),
-                const SizedBox(height: 6),
-
+            const SizedBox(height: 6),
             _appleButton(),
+            const SizedBox(height: 6),
+            _forgotButton(),
           ],
         ),
       ),
