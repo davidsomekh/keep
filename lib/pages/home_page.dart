@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import '/db.dart';
 import '/auth.dart';
 import 'package:flutter/material.dart';
 import '/google_sign_in.dart';
@@ -9,16 +10,62 @@ class HomePage extends StatefulWidget {
 
   @override
   State<HomePage> createState() => _HomePageState();
-
 }
 
 class _HomePageState extends State<HomePage> {
-
   final User? user = Auth().currentUser;
 
   Future<void> signOut() async {
-   
     await Auth().signOut();
+  }
+
+  Future<void> addRecord() async {
+    try {
+      await DB().addTestRecord();
+
+      showError('Record added!');
+    } on FirebaseException catch (e) {
+      showError(e.message!);
+    }
+  }
+
+  Future<void> updateRecord() async {
+    try {
+      await DB().updateTestRecord();
+
+      showError('Record updated!');
+    } on FirebaseException catch (e) {
+      showError(e.message!);
+    }
+  }
+
+  Future<void> deleteRecord() async {
+    try {
+      await DB().deleteTestRecord();
+
+      showError('Record deleted!');
+    } on FirebaseException catch (e) {
+      showError(e.message!);
+    }
+  }
+
+  Future<void> getRecords() async {
+    //print('h')
+    try {
+      // DB().getCollectionUpdates();
+
+      showError('Record deleted!');
+    } on FirebaseException catch (e) {
+      showError(e.message!);
+    }
+  }
+
+  void showError(String msg) {
+    var snackBar = SnackBar(content: Text(msg));
+
+// Find the ScaffoldMessenger in the widget tree
+// and use it to show a SnackBar.
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   Widget _title() {
@@ -34,7 +81,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _userImage() {
-    if (user == null) return const Text("no image");
+    if (user?.photoURL == null) return const Text("");
 
     return CircleAvatar(
         radius: 40, backgroundImage: NetworkImage(user?.photoURL ?? ''));
@@ -42,16 +89,55 @@ class _HomePageState extends State<HomePage> {
 
   Widget _signOutButton() {
     return ElevatedButton(
-      onPressed: (){
-           final provider = Provider.of<GoogleSignInProvider>(context,listen:false);
-           provider.googleLogout();
-           signOut();
+      onPressed: () {
+        final provider =
+            Provider.of<GoogleSignInProvider>(context, listen: false);
+        provider.googleLogout();
+        signOut();
       },
       child: const Text('Sign Out'),
     );
   }
 
-  
+  Widget _editTaskButton() {
+    return ElevatedButton(
+      onPressed: () {
+        updateRecord();
+      },
+      child: const Text('Edit Task'),
+    );
+  }
+
+  Widget _deleteTaskButton() {
+    return ElevatedButton(
+      onPressed: () {
+        deleteRecord();
+      },
+      child: const Text('Delete Task'),
+    );
+  }
+
+  Widget _addTaskButton() {
+    return ElevatedButton(
+      onPressed: () {
+        addRecord();
+      },
+      child: const Text('New Task'),
+    );
+  }
+
+  Widget _getTaskButton() {
+    return ElevatedButton(
+      onPressed: () {
+        getRecords();
+      },
+      child: const Text('Get Tasks'),
+    );
+  }
+
+  Widget buildTest(Test rec) {
+    return ListTile(title: Text(rec.name));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,23 +145,38 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: _title(),
       ),
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const SizedBox(height: 32),
-            _userImage(),
-            const SizedBox(height: 8),
-            _userFullName(),
-            _userUid(),
-            _signOutButton(),
-          ],
-        ),
-      ),
+      body: StreamBuilder<List<Test>>(
+          stream: DB().getCollectionUpdates(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Text('Error loading data! ${snapshot.error}');
+            } else if (snapshot.hasData) {
+              final data = snapshot.data!;
+
+              return Container(
+                height: double.infinity,
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: <Widget>[
+                    ListView(
+                        shrinkWrap: true,
+                        children: data.map(buildTest).toList()),
+                    const SizedBox(height: 32),
+                    const SizedBox(height: 8),
+                    _addTaskButton(),
+                    const SizedBox(height: 8),
+                    _userFullName(),
+                    _userUid(),
+                    _userImage(),
+                    _signOutButton(),
+                  ],
+                ),
+              );
+            } else {
+              return const Center(child: CircularProgressIndicator());
+            }
+          }),
     );
   }
 }
