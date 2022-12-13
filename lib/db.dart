@@ -46,7 +46,9 @@ class DB {
   }
 
   Stream<List<Test>> getCollectionUpdates() => FirebaseFirestore.instance
-      .collection('test')
+      .collection('users')
+      .doc(_firebaseAuth.currentUser?.uid)
+      .collection('tasks')
       .snapshots()
       .map((snapshot) =>
           snapshot.docs.map((doc) => Test.fromJson(doc.data())).toList());
