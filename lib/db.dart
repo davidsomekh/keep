@@ -11,17 +11,21 @@ class DB {
 
   Future addTestRecord() async {
     if (_firebaseAuth.currentUser?.uid == null) return;
-    
+
     String? sUID = _firebaseAuth.currentUser?.uid;
 
     final usersCollection = FirebaseFirestore.instance.collection('users');
     final docUser = usersCollection.doc(sUID);
     final sTasksCollection = docUser.collection('tasks');
 
-    //  final docUser = FirebaseFirestore.instance.collection("users/${sUID!}");
-    final json = {"name": "david"};
+    Task t = Task();
 
-    await sTasksCollection.add(json);
+    t.owner = sUID!;
+
+    //  final docUser = FirebaseFirestore.instance.collection("users/${sUID!}");
+    //final json =
+
+    await sTasksCollection.add(t.toJson());
   }
 
   void clearPersistence() async {
@@ -69,4 +73,29 @@ class Test {
   static Test fromJson(Map<String, dynamic> json) => Test(
         name: json['name'],
       );
+}
+
+class Task {
+  bool deleted = false;
+  bool done = false;
+  String name = "david";
+  String owner = "dave";
+  int priority = 3;
+  String project = "inbox";
+  String created = "";
+
+  String getTimeStamp() {
+    DateTime now = DateTime.now();
+    return now.toString();
+  }
+
+  Map<String, dynamic> toJson() => {
+        'deleted': deleted,
+        'done': done,
+        'name': name,
+        'owner': owner,
+        'priority': priority,
+        'project': project,
+        'created': FieldValue.serverTimestamp()
+      };
 }
