@@ -9,7 +9,7 @@ class DB {
 
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 
-  Future addTestRecord() async {
+  Future addTaskRecord() async {
     if (_firebaseAuth.currentUser?.uid == null) return;
 
     String? sUID = _firebaseAuth.currentUser?.uid;
@@ -19,11 +19,7 @@ class DB {
     final sTasksCollection = docUser.collection('tasks');
 
     Task t = Task();
-
     t.owner = sUID!;
-
-    //  final docUser = FirebaseFirestore.instance.collection("users/${sUID!}");
-    //final json =
 
     await sTasksCollection.add(t.toJson());
   }

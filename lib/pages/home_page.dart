@@ -21,7 +21,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> addRecord() async {
     try {
-      await DB().addTestRecord();
+      await DB().addTaskRecord();
 
       showError('Record added!');
     } on FirebaseException catch (e) {
