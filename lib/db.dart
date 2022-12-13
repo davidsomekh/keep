@@ -9,7 +9,7 @@ class DB {
 
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 
-  Future addTaskRecord() async {
+  Future addTaskRecord(String name) async {
     if (_firebaseAuth.currentUser?.uid == null) return;
 
     String? sUID = _firebaseAuth.currentUser?.uid;
@@ -18,8 +18,9 @@ class DB {
     final docUser = usersCollection.doc(sUID);
     final sTasksCollection = docUser.collection('tasks');
 
-    Task t = Task();
+    Task t = Task(created: Timestamp.now());
     t.owner = sUID!;
+    t.name = name;
 
     await sTasksCollection.add(t.toJson());
   }
@@ -45,13 +46,13 @@ class DB {
     await docUser.doc('HyPC5RPLr4IgycWRs2W7').delete();
   }
 
-  Stream<List<Test>> getCollectionUpdates() => FirebaseFirestore.instance
+  Stream<List<Task>> getCollectionUpdates() => FirebaseFirestore.instance
       .collection('users')
       .doc(_firebaseAuth.currentUser?.uid)
       .collection('tasks')
       .snapshots()
       .map((snapshot) =>
-          snapshot.docs.map((doc) => Test.fromJson(doc.data())).toList());
+          snapshot.docs.map((doc) => Task.fromJson(doc.data())).toList());
 
   Future<QuerySnapshot<Map<String, dynamic>>> getOfflineData() =>
       FirebaseFirestore.instance
@@ -76,11 +77,33 @@ class Test {
 class Task {
   bool deleted = false;
   bool done = false;
-  String name = "david";
+  String name = "babo";
   String owner = "dave";
   int priority = 3;
   String project = "inbox";
-  String created = "";
+  Timestamp created;
+
+  Task({
+    this.name = '',
+    this.done = false,
+    this.deleted = false,
+    this.owner = "dave",
+    this.priority = 3,
+    this.project = 'inbox',
+    required this.created,
+    // this.created = '',
+//    this.created = FieldValue.serverTimestamp(),
+  });
+
+  static Task fromJson(Map<String, dynamic> json) => Task(
+        name: json['name'],
+        done: json['done'],
+        deleted: json['deleted'],
+        owner: json['owner'],
+        priority: json['priority'],
+        project: json['project'],
+        created: json['created'],
+      );
 
   String getTimeStamp() {
     DateTime now = DateTime.now();

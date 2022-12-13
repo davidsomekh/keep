@@ -21,7 +21,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> addRecord() async {
     try {
-      await DB().addTaskRecord();
+      await DB().addTaskRecord("dart rules");
 
       showError('Record added!');
     } on FirebaseException catch (e) {
@@ -135,7 +135,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildTest(Test rec) {
+  Widget buildTest(Task rec) {
     return ListTile(title: Text(rec.name));
   }
 
@@ -145,7 +145,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: _title(),
       ),
-      body: StreamBuilder<List<Test>>(
+      body: StreamBuilder<List<Task>>(
           stream: DB().getCollectionUpdates(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
