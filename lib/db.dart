@@ -10,10 +10,18 @@ class DB {
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 
   Future addTestRecord() async {
-    final docUser = FirebaseFirestore.instance.collection("test");
+    if (_firebaseAuth.currentUser?.uid == null) return;
+    
+    String? sUID = _firebaseAuth.currentUser?.uid;
+
+    final usersCollection = FirebaseFirestore.instance.collection('users');
+    final docUser = usersCollection.doc(sUID);
+    final sTasksCollection = docUser.collection('tasks');
+
+    //  final docUser = FirebaseFirestore.instance.collection("users/${sUID!}");
     final json = {"name": "david"};
 
-    await docUser.add(json);
+    await sTasksCollection.add(json);
   }
 
   void clearPersistence() async {

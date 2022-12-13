@@ -1,11 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '/db.dart';
 import '/auth.dart';
 import 'package:flutter/material.dart';
 import '/google_sign_in.dart';
 import 'package:provider/provider.dart';
-import 'dart:math';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -96,7 +94,6 @@ class _HomePageState extends State<HomePage> {
             Provider.of<GoogleSignInProvider>(context, listen: false);
         provider.googleLogout();
         signOut();
-        DB().clearPersistence();
       },
       child: const Text('Sign Out'),
     );
@@ -129,15 +126,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _source(String src) {
-    return ElevatedButton(
-      onPressed: () {
-        addRecord();
-      },
-      child: Text(src),
-    );
-  }
-
   Widget _getTaskButton() {
     return ElevatedButton(
       onPressed: () {
@@ -147,46 +135,23 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildList(BuildContext context, QueryDocumentSnapshot? document) {
-   // print(document);
-    if (document == null) return const Text("hi");
-    return ListTile(
-      title: Text(document['name']),
-      subtitle: Text(document['name']),
-    );
-  }
-
   Widget buildTest(Test rec) {
     return ListTile(title: Text(rec.name));
   }
 
   @override
   Widget build(BuildContext context) {
-    Random random = Random();
-
     return Scaffold(
       appBar: AppBar(
         title: _title(),
       ),
-      body: FutureBuilder<QuerySnapshot>(
-          future: 50 > random.nextInt(100)
-              ? DB().getOnlineData()
-              : DB().getOfflineData(),
-          builder:
-              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+      body: StreamBuilder<List<Test>>(
+          stream: DB().getCollectionUpdates(),
+          builder: (context, snapshot) {
             if (snapshot.hasError) {
-              return Text(snapshot.error.toString());
-            }
-
-            //  if (snapshot.hasData) {
-            //  return Text("Document does not exist");
-            // }
-
-            if (snapshot.connectionState == ConnectionState.done) {
-              String src = 'online';
-              bool? ds = snapshot.data?.metadata.isFromCache ?? false;
-              if (ds) src = "offline";
-                 // print(data);
+              return Text('Error loading data! ${snapshot.error}');
+            } else if (snapshot.hasData) {
+              final data = snapshot.data!;
 
               return Container(
                 height: double.infinity,
@@ -194,29 +159,23 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   children: <Widget>[
-                    _source(src),
-                    const SizedBox(height: 8),
-                    _signOutButton(),
-                    ListView.builder(
-                        itemCount: snapshot.data?.docs.length,
+                    ListView(
                         shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          return _buildList(
-                              context, snapshot.data?.docs[index]);
-                        }),
+                        children: data.map(buildTest).toList()),
+                    const SizedBox(height: 32),
+                    const SizedBox(height: 8),
+                    _addTaskButton(),
+                    const SizedBox(height: 8),
+                    _userFullName(),
+                    _userUid(),
+                    _userImage(),
+                    _signOutButton(),
                   ],
                 ),
               );
-
-              //data.docs.forEach((key,value){
-
-              // }
-
-              // Map<String, dynamic> data = snapshot.data!;
-              //     return Text("Printed data");
+            } else {
+              return const Center(child: CircularProgressIndicator());
             }
-
-            return const Text("good things");
           }),
     );
   }
