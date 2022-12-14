@@ -82,7 +82,6 @@ class Task {
   int priority = 3;
   String project = "inbox";
   Timestamp created;
-
   Task({
     this.name = '',
     this.done = false,
@@ -102,7 +101,7 @@ class Task {
         owner: json['owner'],
         priority: json['priority'],
         project: json['project'],
-        created: json['created'],
+        created: json['created'] ?? Timestamp.now(),
       );
 
   String getTimeStamp() {

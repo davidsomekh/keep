@@ -4,6 +4,7 @@ import '/auth.dart';
 import 'package:flutter/material.dart';
 import '/google_sign_in.dart';
 import 'package:provider/provider.dart';
+import 'dart:math';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -23,7 +24,7 @@ class _HomePageState extends State<HomePage> {
     try {
       await DB().addTaskRecord("dart rules");
 
-      showError('Record added!');
+      //showError('Record added!');
     } on FirebaseException catch (e) {
       showError(e.message!);
     }
@@ -70,6 +71,12 @@ class _HomePageState extends State<HomePage> {
 
   Widget _title() {
     return const Text('Welcome to keeplist! 👋');
+  }
+
+  String generateRandomString(int len) {
+    var r = Random();
+    return String.fromCharCodes(
+        List.generate(len, (index) => r.nextInt(33) + 89));
   }
 
   Widget _userUid() {
@@ -136,7 +143,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget buildTest(Task rec) {
-    return ListTile(title: Text(rec.name));
+    int index = 22;
+    return ListTile(key: Key(generateRandomString(7)), title: Text(rec.name));
   }
 
   @override
@@ -157,20 +165,26 @@ class _HomePageState extends State<HomePage> {
                 height: double.infinity,
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: <Widget>[
-                    ListView(
-                        shrinkWrap: true,
-                        children: data.map(buildTest).toList()),
-                    const SizedBox(height: 32),
-                    const SizedBox(height: 8),
-                    _addTaskButton(),
-                    const SizedBox(height: 8),
-                    _userFullName(),
-                    _userUid(),
-                    _userImage(),
-                    _signOutButton(),
-                  ],
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
+                  child: Column(
+                    children: <Widget>[
+                      Scrollbar(
+                        child: ReorderableListView(
+                            onReorder: (int oldIndex, int newIndex) {},
+                            shrinkWrap: true,
+                            children: data.map(buildTest).toList()),
+                      ),
+                      const SizedBox(height: 32),
+                      const SizedBox(height: 8),
+                      _addTaskButton(),
+                      const SizedBox(height: 8),
+                      _userFullName(),
+                      _userUid(),
+                      _userImage(),
+                      _signOutButton(),
+                    ],
+                  ),
                 ),
               );
             } else {
