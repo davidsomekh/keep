@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'dart:math';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -133,6 +134,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  double GetListPadding() {
+    if (kIsWeb) return 40;
+    return 0;
+  }
+
   Widget _getTaskButton() {
     return ElevatedButton(
       onPressed: () {
@@ -149,48 +155,51 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final Color oddItemColor = colorScheme.primary.withOpacity(0.05);
+    final Color evenItemColor = colorScheme.primary.withOpacity(0.15);
+
+    final List<int> items = List<int>.generate(50, (int index) => index);
+
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          addRecord();
+        },
+        backgroundColor: Colors.green,
+        child: const Icon(Icons.add),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: AppBar(
         title: _title(),
       ),
       body: StreamBuilder<List<Task>>(
-          stream: DB().getCollectionUpdates(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Text('Error loading data! ${snapshot.error}');
-            } else if (snapshot.hasData) {
-              final data = snapshot.data!;
+        stream: DB().getCollectionUpdates(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Text('Error loading data! ${snapshot.error}');
+          } else if (snapshot.hasData) {
+            final data = snapshot.data!;
 
-              return Container(
-                height: double.infinity,
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: Column(
-                    children: <Widget>[
-                      Scrollbar(
-                        child: ReorderableListView(
-                            onReorder: (int oldIndex, int newIndex) {},
-                            shrinkWrap: true,
-                            children: data.map(buildTest).toList()),
-                      ),
-                      const SizedBox(height: 32),
-                      const SizedBox(height: 8),
-                      _addTaskButton(),
-                      const SizedBox(height: 8),
-                      _userFullName(),
-                      _userUid(),
-                      _userImage(),
-                      _signOutButton(),
-                    ],
-                  ),
-                ),
-              );
-            } else {
-              return const Center(child: CircularProgressIndicator());
-            }
-          }),
+            return ReorderableListView(
+              padding: EdgeInsets.symmetric(horizontal: GetListPadding()),
+              children: data.map(buildTest).toList(),
+              onReorder: (int oldIndex, int newIndex) {
+                setState(() {
+                  print(newIndex);
+                  if (oldIndex < newIndex) {
+                    newIndex -= 1;
+                  }
+                  final int item = items.removeAt(oldIndex);
+                  items.insert(newIndex, item);
+                });
+              },
+            );
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
     );
   }
 }
