@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'auth.dart';
-import 'pages/home_page.dart';
+import 'pages/navigation.dart';
 import 'pages/login_page.dart';
 
 class WidgetTree extends StatefulWidget {
@@ -19,7 +19,7 @@ class _WidgetTreeState extends State<WidgetTree> {
         if(snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasData) {
-          return const HomePage();
+          return const NavPage();
         } else {
           return const LoginPage();
         }
