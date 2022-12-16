@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 
 import 'dart:math';
 
-
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class HomePage extends StatefulWidget {
@@ -71,21 +70,25 @@ class _HomePageState extends State<HomePage> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-
   String generateRandomString(int len) {
     var r = Random();
     return String.fromCharCodes(
         List.generate(len, (index) => r.nextInt(33) + 89));
   }
 
-
   double getListPadding() {
     if (kIsWeb) return 40;
     return 0;
   }
 
-  Widget buildTest(Task rec) {
-    return ListTile(key: Key(generateRandomString(7)), title: Text(rec.name));
+  Widget buiidList(Task rec) {
+    return ListTile(
+      key: Key(generateRandomString(7)),
+      title: Text(rec.name),
+      onTap: () {
+        //print(rec.id);
+      },
+    );
   }
 
   @override
@@ -93,7 +96,6 @@ class _HomePageState extends State<HomePage> {
     final List<int> items = List<int>.generate(50, (int index) => index);
 
     return Scaffold(
-      
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           addRecord();
@@ -102,7 +104,6 @@ class _HomePageState extends State<HomePage> {
         child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-     
       body: StreamBuilder<List<Task>>(
         stream: DB().getCollectionUpdates(),
         builder: (context, snapshot) {
@@ -113,7 +114,7 @@ class _HomePageState extends State<HomePage> {
 
             return ReorderableListView(
               padding: EdgeInsets.symmetric(horizontal: getListPadding()),
-              children: data.map(buildTest).toList(),
+              children: data.map(buiidList).toList(),
               onReorder: (int oldIndex, int newIndex) {
                 setState(() {
                   // print(newIndex);
