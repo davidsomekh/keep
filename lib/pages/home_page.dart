@@ -83,7 +83,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget buiidList(Task rec) {
     return ListTile(
-      key: Key(generateRandomString(7)),
+      key: Key(rec.id),
       title: Text(rec.name),
       onTap: () {
         //print(rec.id);
