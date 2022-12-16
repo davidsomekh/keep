@@ -81,12 +81,30 @@ class _HomePageState extends State<HomePage> {
     return 0;
   }
 
+  Widget getTaskOVerlay(String taskName) {
+    return Text(taskName,
+        style: const TextStyle(
+            color: Colors.black, decoration: TextDecoration.none));
+  }
+
+  void showOverlay(BuildContext context, String taskName) {
+    OverlayState overlayState = Overlay.of(context)!;
+    OverlayEntry overlayEntry = OverlayEntry(
+        opaque: false,
+        builder: (context) => Stack(
+            alignment: Alignment.center,
+            children: <Widget>[getTaskOVerlay(taskName)]));
+
+    overlayState.insert(overlayEntry);
+  }
+
   Widget buiidList(Task rec) {
     return ListTile(
       key: Key(rec.id),
       title: Text(rec.name),
       onTap: () {
         //print(rec.id);
+        showOverlay(context, rec.name);
       },
     );
   }
