@@ -4,6 +4,7 @@ import '/auth.dart';
 import 'package:flutter/material.dart';
 
 import 'dart:math';
+import '/pages/task_page.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -19,36 +20,6 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> signOut() async {
     await Auth().signOut();
-  }
-
-  Future<void> addRecord() async {
-    try {
-      await DB().addTaskRecord("dart rules");
-
-      //showError('Record added!');
-    } on FirebaseException catch (e) {
-      showError(e.message!);
-    }
-  }
-
-  Future<void> updateRecord() async {
-    try {
-      await DB().updateTestRecord();
-
-      showError('Record updated!');
-    } on FirebaseException catch (e) {
-      showError(e.message!);
-    }
-  }
-
-  Future<void> deleteRecord() async {
-    try {
-      await DB().deleteTestRecord();
-
-      showError('Record deleted!');
-    } on FirebaseException catch (e) {
-      showError(e.message!);
-    }
   }
 
   Future<void> getRecords() async {
@@ -87,15 +58,28 @@ class _HomePageState extends State<HomePage> {
             color: Colors.black, decoration: TextDecoration.none));
   }
 
-  void showOverlay(BuildContext context, String taskName) {
-    OverlayState overlayState = Overlay.of(context)!;
-    OverlayEntry overlayEntry = OverlayEntry(
-        opaque: false,
-        builder: (context) => Stack(
-            alignment: Alignment.center,
-            children: <Widget>[getTaskOVerlay(taskName)]));
+  void onTaskPage(
+      BuildContext context, String taskName, bool taskEdit, String id) {
+    showGeneralDialog(
+        context: context,
+        pageBuilder: (context, anim1, anim2) {
+          return const Text("hi");
+        },
+        barrierDismissible: true,
+        barrierColor: Colors.black.withOpacity(0.4),
+        barrierLabel: '',
+        transitionBuilder: (context, anim1, anim2, child) {
+          final curvedValue = Curves.easeInOutBack.transform(anim1.value) - 1.0;
 
-    overlayState.insert(overlayEntry);
+          return Transform(
+            transform: Matrix4.translationValues(0.0, curvedValue * 200, 0.0),
+            child: Opacity(
+              opacity: anim1.value,
+              child: TaskPage(name: taskName, edit: taskEdit, id: id),
+            ),
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 300));
   }
 
   Widget buiidList(Task rec) {
@@ -103,8 +87,7 @@ class _HomePageState extends State<HomePage> {
       key: Key(rec.id),
       title: Text(rec.name),
       onTap: () {
-        //print(rec.id);
-        showOverlay(context, rec.name);
+        onTaskPage(context, rec.name, true, rec.id);
       },
     );
   }
@@ -116,7 +99,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          addRecord();
+          onTaskPage(context, "", false, "");
         },
         backgroundColor: Colors.green,
         child: const Icon(Icons.add),

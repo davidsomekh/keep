@@ -34,16 +34,25 @@ class DB {
     // await FirebaseFirestore.instance.settings();
   }
 
-  Future updateTestRecord() async {
-    final docUser = FirebaseFirestore.instance.collection("test");
-    final json = {"name": "david_edit"};
+  Future updateRecord(String id, String name) async {
+    final docUser = FirebaseFirestore.instance
+        .collection("users")
+        .doc(_firebaseAuth.currentUser?.uid)
+        .collection('tasks')
+        .doc(id);
+    final json = {"name": name};
 
-    await docUser.doc('HyPC5RPLr4IgycWRs2W7').update(json);
+    await docUser.update(json);
   }
 
-  Future deleteTestRecord() async {
-    final docUser = FirebaseFirestore.instance.collection("test");
-    await docUser.doc('HyPC5RPLr4IgycWRs2W7').delete();
+  Future deleteRecord(String id) async {
+    final docUser = FirebaseFirestore.instance
+        .collection("users")
+        .doc(_firebaseAuth.currentUser?.uid)
+        .collection('tasks')
+        .doc(id);
+
+    await docUser.delete();
   }
 
   Stream<List<Task>> getCollectionUpdates() => FirebaseFirestore.instance
@@ -51,10 +60,9 @@ class DB {
       .doc(_firebaseAuth.currentUser?.uid)
       .collection('tasks')
       .snapshots()
-      .map((snapshot) =>
-          snapshot.docs.map((doc) => Task.fromJson(doc.data(),doc.id)).toList());
-          
-
+      .map((snapshot) => snapshot.docs
+          .map((doc) => Task.fromJson(doc.data(), doc.id))
+          .toList());
 
   Future<QuerySnapshot<Map<String, dynamic>>> getOfflineData() =>
       FirebaseFirestore.instance
@@ -83,7 +91,7 @@ class Task {
   String owner = "dave";
   int priority = 3;
   String project = "inbox";
-  String id="";
+  String id = "";
   Timestamp created;
   Task({
     this.name = '',
@@ -91,21 +99,21 @@ class Task {
     this.deleted = false,
     this.owner = "dave",
     this.priority = 3,
-    this.id="",
+    this.id = "",
     this.project = 'inbox',
     required this.created,
     // this.created = '',
 //    this.created = FieldValue.serverTimestamp(),
   });
 
-  static Task fromJson(Map<String, dynamic> json,String sDocID) => Task(
+  static Task fromJson(Map<String, dynamic> json, String sDocID) => Task(
         name: json['name'],
         done: json['done'],
         deleted: json['deleted'],
         owner: json['owner'],
         priority: json['priority'],
         project: json['project'],
-        id:sDocID,
+        id: sDocID,
         created: json['created'] ?? Timestamp.now(),
       );
 
